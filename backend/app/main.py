@@ -11,35 +11,81 @@ from core.config import settings
 from core.security import setup_cors
 from api.api_v1 import api_router
 
-# Create FastAPI application
+# Create FastAPI application with production settings
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
-    description="Full-Stack AI Application with Groq Integration",
-    docs_url="/docs",  # Swagger UI
-    redoc_url="/redoc"  # Alternative documentation
+    description="""
+    🏛️ **Bangladesh Legal AI Assistant**
+    
+    একটি সম্পূর্ণ আইনি সহায়তা সিস্টেম যা বাংলাদেশের আইন অনুযায়ী পরামর্শ প্রদান করে।
+    
+    **Features:**
+    - 🤖 AI-powered legal advice in Bengali & English
+    - ⚖️ Bangladesh-specific legal knowledge  
+    - 📋 Step-by-step legal procedures
+    - 📞 Emergency legal contacts
+    - 📚 Legal education and tips
+    
+    **Disclaimer:** এই সিস্টেম শুধুমাত্র তথ্যগত উদ্দেশ্যে। নির্দিষ্ট আইনি সমস্যার জন্য অভিজ্ঞ আইনজীবীর পরামর্শ নিন।
+    """,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    contact={
+        "name": "Bangladesh Legal AI",
+        "url": "https://github.com/adibmahmud007/fullstack-chatbot-ai",
+    },
+    license_info={
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    }
 )
 
-# Setup CORS for frontend connection
+# Setup CORS for production
 setup_cors(app)
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
 
-# Root endpoint
+# Root endpoint with API information
 @app.get("/")
 def read_root():
     return {
-        "message": "AI FullStack API is running!",
-        "docs": "/docs",
-        "version": settings.app_version
+        "message": "🏛️ Bangladesh Legal AI Assistant API",
+        "version": settings.app_version,
+        "status": "running",
+        "documentation": "/docs",
+        "features": [
+            "AI Legal Advice",
+            "Bangladesh Law Explanations", 
+            "Legal Procedures",
+            "Emergency Contacts",
+            "Bilingual Support (Bengali + English)"
+        ],
+        "endpoints": {
+            "legal_advice": "/api/v1/legal/legal-advice",
+            "legal_categories": "/api/v1/legal/legal-categories",
+            "emergency_contacts": "/api/v1/legal/emergency-contacts",
+            "ai_chat": "/api/v1/ai/chat"
+        }
     }
 
+# Health check for production monitoring
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "app_name": settings.app_name,
+        "version": settings.app_version,
+        "environment": "production" if os.getenv("RENDER") else "development"
+    }
+
+# Production server setup
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         "main:app", 
-        host="0.0.0.0", 
-        port=8000, 
-        reload=True
+        host=settings.host,
+        port=settings.port,
+        reload=False  # Production এ reload False
     )
