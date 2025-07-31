@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse # pyright: ignore[reportMissingImports]
 from models.schemas import ChatRequest, ChatResponse, ErrorResponse
 from services.groq_service import groq_service
 import json
